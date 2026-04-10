@@ -1,69 +1,76 @@
-# 🚀 Cross-Platform Test Automation Strategy (API & UI)
+# Week 1 API Foundation
 
-A robust, enterprise-grade E2E test automation framework built with Python. Designed for scalability, maintainability, and zero-hardcoding. This repository serves as a showcase of modern Quality Engineering practices, spanning across API integration and Web automation.
+This repository currently implements Week 1 of the roadmap: a clean API automation foundation built with `pytest`, `requests`, and environment-based configuration.
 
-## 🎯 Design Philosophy
-Coming from a strong Native Mobile Development background (7+ years of iOS), this framework is designed with architectural discipline in mind:
-*   **Dependency Injection over Setup/Teardown:** Utilizing Pytest's `conftest.py` and `yield` fixtures to manage test lifecycles (Setup/Teardown) efficiently without polluting test scripts.
-*   **Zero Hardcoding:** Test data and environmental variables (like `BASE_URL`, `auth_token`) are decoupled and injected dynamically.
-*   **Data-Driven Framework:** Leveraging `@pytest.mark.parametrize` to avoid brittle `for-loops` inside test execution, isolating test outputs perfectly.
-*   **Agnostic Locators:** Utilizing Playwright's `get_by_placeholder` and CSS assertions (similar to XCUITest Accessibility ID mapping) for resilient frontend testing.
+## What Is Included
 
-## 🛠 Tech Stack
-*   **Core:** Python 3
-*   **Test Runner:** Pytest (via `conftest` architecture)
-*   **API Automation:** `Requests`
-*   **Web Automation (UI):** Microsoft Playwright (`pytest-playwright`)
+- `conftest.py`: session-scoped fixtures for settings, API client, and authenticated login
+- `core/api_client.py`: one shared API helper so requests are not scattered through test files
+- `tests/api/`: login and cart tests written with `pytest.mark.parametrize`
+- `pytest.ini`: central pytest configuration and test markers
+- `requirements.txt`: pinned starter dependencies for reproducible setup
 
-## 📁 Repository Structure
+## Project Structure
 
-    ├── conftest.py           # Global Fixtures, Test Lifecycles, Auth Managers
-    ├── tests/
-    │   ├── api/
-    │   │   ├── test_dummy.py     # API infrastructure verification
-    │   │   └── test_products.py  # Token injection & Data-driven validations
-    │   └── web/
-    │       └── test_playwright_demo.py # Playwright UI tests with Smart Assertions
-    ├── .gitignore
-    └── README.md
+```text
+.
+├── core/
+│   └── api_client.py
+├── tests/
+│   └── api/
+│       ├── test_auth.py
+│       └── test_carts.py
+├── .env.example
+├── conftest.py
+├── pytest.ini
+└── requirements.txt
+```
 
-## 🚀 Getting Started
+## Setup
 
-### 1. Environment Setup
-Clone the repository and set up a clean Python virtual environment:
+1. Create and activate a virtual environment.
+2. Install dependencies:
 
-    # Clone the repo
-    git clone https://github.com/YourUsername/sdet-automation-portfolio.git
-    cd sdet-automation-portfolio
-    
-    # Initialize Virtual Environment
-    python3 -m venv venv
-    source venv/bin/activate
+```bash
+pip install -r requirements.txt
+```
 
-### 2. Install Dependencies
-Install all required libraries including the Playwright browser binaries:
+3. Copy `.env.example` to `.env` and fill in real test credentials.
 
-    # Install core packages
-    pip install pytest requests pytest-playwright
-    
-    # Install headless browser binaries for Playwright
-    playwright install
+## Environment Variables
 
-## 🧪 Execution
+```env
+BASE_URL=https://dummyjson.com
+TEST_USERNAME=your_api_username
+TEST_PASSWORD=your_api_password
+```
 
-### API Automation Tests
-Run tests without UI, utilizing session-scoped authentication fixtures:
+## Run Tests
 
-    pytest tests/api/ -v -s
+Run the whole API suite:
 
-### Web UI Automation Tests
-Run the Playwright test suite in **Headed Mode** with an artificial delay (for visual demonstration purposes):
+```bash
+pytest tests/api -v
+```
 
-    pytest tests/web/ -v -s --headed --slowmo=500
+Run only smoke checks:
 
-*(Remove `--headed` to run the suite in the background as it would in a CI/CD pipeline).*
+```bash
+pytest tests/api -v -m smoke
+```
 
-## ⏭️ Upcoming Features (Roadmap)
-- [ ] **Mobile Automation:** Extend the framework using **Appium 2.0** (XCUITest & UiAutomator2).
-- [ ] **Game Automation:** Integrate **Airtest / PocoSDK** for Unity-engine Object Hierarchy inspection.
-- [ ] **CI/CD Integration:** Auto-trigger executions via **GitHub Actions**.
+Run only regression checks:
+
+```bash
+pytest tests/api -v -m regression
+```
+
+## Allure
+
+Week 1 includes the dependency for Allure so the report can be added as the next step in the workflow.
+
+Example command:
+
+```bash
+pytest tests/api -v --alluredir=reports/allure-results
+```

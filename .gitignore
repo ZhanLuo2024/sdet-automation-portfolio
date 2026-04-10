@@ -26,6 +26,7 @@ coverage.xml
 # Playwright
 playwright-report/
 test-results/
+reports/
 
 # IDE
 .vscode/
