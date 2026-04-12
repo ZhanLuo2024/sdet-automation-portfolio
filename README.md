@@ -65,6 +65,10 @@ Run only regression checks:
 pytest tests/api -v -m regression
 ```
 
+## Note on Web UI Tests
+
+SauceDemo does not expose session tokens or cookies that can be injected to bypass the login UI. The login flow is therefore automated through the Page Object rather than skipped via state injection. In a real project where the target application supports cookie or local storage pre-seeding, the preferred approach would be to inject authenticated state directly into the browser context.
+
 ## Allure
 
 Week 1 includes the dependency for Allure so the report can be added as the next step in the workflow.
