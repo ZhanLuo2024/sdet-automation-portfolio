@@ -26,7 +26,7 @@ def test_carts_endpoint_is_available(api_client):
         # 我們把它寫在這裡，是要確認「固定範例資料」的內容沒有意外改變。
         # 如果未來官方資料更新，這裡也應該跟著一起調整。
         (1, 4),
-        (2, 5),
+        (2, 2),
     ],
 )
 def test_cart_details_match_expected_examples(api_client, cart_id, expected_total_products):

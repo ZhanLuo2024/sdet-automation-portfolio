@@ -79,3 +79,56 @@ def auth_session(api_client, settings):
         "token": access_token,
         "user": payload,
     }
+
+# web test fixture
+@pytest.fixture(scope="session")
+def ui_credentials():
+    """
+    讀取 web UI 測試用的帳密
+
+    和 API 的 settings fixture 同樣的設計思路
+    帳密從環境變數注入，不寫死在程式碼裡
+    """
+    username = os.getenv("UI_USERNAME")
+    password = os.getenv("UI_PASSWORD")
+
+    assert username, "請先設定 UI_USERNAME"
+    assert password, "請先設定 UI_PASSWORD"
+
+    return {"username": username, "password": password}
+
+@pytest.fixture()
+def screenshot_on_failure(request, page):
+    """
+    測試失敗自動截圖，保存到 reports/screenshots/ 目錄
+
+    這是一個 yield fixture：
+    - yield 之前：什麼都不做，讓測試正常執行
+    - yield 之後：檢查測試結果，如果失敗就截圖
+
+    截圖檔名使用測試的 node id （例如： test_login[chromium]）
+    方便從檔名直接定位是哪個測試失敗
+    """
+    yield
+
+    if request.node.rep_call and request.node.rep_call.failed:
+        screenshot_dir = "reports/screenshots"
+        os.makedirs(screenshot_dir, exist_ok=True)
+
+        # 把測試名稱中特殊字符替換成底線，避免不合法
+        test_name = request.node.nodeid.replace("/", "_").replace("::", "_")
+        page.screenshot(path=f"{screenshot_dir}/{test_name}.png")
+
+@pytest.hookimpl(tryfirst=True, hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    """
+    pytest hook： 在每個測試階段結束後，把測試結果存到 item 上
+
+    這樣 screenshot_on_failure fixture 才能透過 request.node.rep_call 拿到測試是否失敗的資訊
+
+    這是 pytest 處理 「fixture 讀取測試結果」的標準作法
+    """
+
+    outcome = yield
+    report = outcome.get_result()
+    setattr(item, f"rep_{report.when}", report)
